@@ -2,6 +2,7 @@
 import webbrowser
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font
 from PIL import Image, ImageTk
 
 
@@ -9,79 +10,71 @@ class BusServicePlanner(tk.Frame):
     """Bus service planner class that keep all user-interface"""
     def __init__(self, parent, bus_data: list, image_path):
         super().__init__(parent)
+        self.info_choice = []
         self.parent = parent
         self.bus_data = bus_data
         self.image_path = image_path
-        self.options = {'sticky': tk.NSEW, 'padx': 2, 'pady': 2}
-        self.result = 'close'
+        self.options = {'sticky': tk.NSEW, 'padx': 5, 'pady': 5}
+        self.info_status = 'close'
         self.init_components()
 
     def init_components(self):
-        font = ('Helvetica', 16)
+        font = ('Times', 12)
         self.parent.option_add('*Font', font)
         self.menubar = tk.Menu(self.parent)
-        self.menubar2 = tk.Menu(self.parent)
         self.parent.config(menu=self.menubar)
 
-        self.frame1 = tk.Frame()
-        self.frame2 = tk.Frame()
-        self.frame3 = tk.Frame()
+        self.title_frame = tk.Frame()
+        self.input_frame = tk.Frame()
+        self.map_frame = tk.Frame()
+        self.info_frame = tk.Frame()
 
         self.label_title()
-        self.add_menu_items()
         self.create_input_box("Route")
         self.create_input_box("Starting")
         self.create_input_box("Ending")
         self.create_button()
         self.display_image()
+        self.add_info_items()
         self.pack_components()
 
     def pack_components(self):
         """Pack components of all frame"""
-        self.frame1.pack(side=tk.TOP, fill=tk.BOTH)
-        self.frame2.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.frame3.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.title_frame.pack(side=tk.TOP, fill=tk.BOTH)
+        self.info_frame.pack(side=tk.LEFT, fill=tk.Y)
+        self.input_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.map_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
         self.parent.config(background="#fffac5")
-        self.frame1.config(background="#ffffff")
-        self.frame2.config(background="#fffac5")
-        self.frame3.config(background="#fffac5")
+        self.title_frame.config(background="#ffffff")
+        self.input_frame.config(background="#fffac5")
+        self.map_frame.config(background="#fffac5")
+        self.info_frame.config(background="#ffc152")
 
     def label_title(self):
         """Create label in frame 1"""
         text = tk.StringVar()
-        label = tk.Label(self.frame1, textvariable=text)
+        label = tk.Label(self.title_frame, textvariable=text)
         label.pack(side=tk.TOP, expand=True)
-        label.config(bg="#ffffff", )
+        label.config(bg="#ffffff")
         text.set("Welcome to Bus Service Planner")
 
-    def add_menu_items(self):
-        """Add menu items"""
-        # Create a single menu object
-        self.menubar = tk.Menu(self.parent)
-
-        # Add menu items to the first menu
-        menu1 = tk.Menu(self.menubar, tearoff=0)
-        menu1.add_cascade(label="Route1", command=lambda x='route1.jpg': self.set_image_path(x))
-        menu1.add_cascade(label="Route3", command=lambda x='route3.jpg': self.set_image_path(x))
-        menu1.add_cascade(label="Special", command=lambda x='special.jpg': self.set_image_path(x))
-        menu1.add_command(label="Exit", command=self.parent.quit)
-        self.menubar.add_cascade(label="Route", menu=menu1)
-
-        # Add menu items to the second menu
-        menu2 = tk.Menu(self.menubar, tearoff=0)
-        menu2.add_command(label="Bar graph")
-        self.menubar.add_cascade(label="Graph", menu=menu2)
-
-        # Configure the parent with the merged menu
-        self.parent.config(menu=self.menubar)
+    def add_info_items(self):
+        """Add info in the frame"""
+        self.info_box = tk.Listbox(self.info_frame)
+        self.info_box.pack(fill=tk.Y, expand=True)
+        self.info_box.config(bg="#af8f55", width=10)
+        self.info_box.bind('<Double-Button-1>', self.info_selected)
+        self.info_choice = ['- Route info', '- Graph']
+        for choice in self.info_choice:
+            self.info_box.insert(tk.END, choice)
 
     def create_input_box(self, label_text):
         """Create an input box"""
-        box_label = tk.Label(self.frame2, text=label_text)
-        box_label.pack(side=tk.TOP, padx=5, pady=5, expand=True)
+        box_label = tk.Label(self.input_frame, text=label_text)
+        box_label.pack(side=tk.TOP)
         box_label.config(background="#fffac5")
-        box = ttk.Combobox(self.frame2)
+        box = ttk.Combobox(self.input_frame)
         box.pack(side=tk.TOP, padx=5, pady=5)
         if label_text == "Route":
             box['values'] = ['Route1', 'Route3', 'Special']
@@ -95,8 +88,8 @@ class BusServicePlanner(tk.Frame):
 
     def create_button(self):
         """Submit function for getting the starting and ending bus stops"""
-        self.submit = tk.Button(self.frame2, text="Submit", command=self.button_clicked)
-        self.submit.pack(side=tk.LEFT, padx=20, pady=10, expand=True)
+        self.submit = tk.Button(self.input_frame, text="Submit", command=self.button_clicked)
+        self.submit.pack(side=tk.TOP, padx=5, pady=5)
 
     def get_bus_stop(self):
         """Get bus stop in term list of name"""
@@ -108,9 +101,8 @@ class BusServicePlanner(tk.Frame):
     def display_image(self):
         """Display image on frame3"""
         img = Image.open(self.image_path)
-        img = img.resize((600, 400), Image.Resampling.LANCZOS)
         photo = ImageTk.PhotoImage(img)
-        label = tk.Label(self.frame3, image=photo)
+        label = tk.Label(self.map_frame, image=photo)
         label.image = photo  # Keep a reference to the image to prevent garbage collection
         label.pack(expand=True)
 
@@ -125,21 +117,47 @@ class BusServicePlanner(tk.Frame):
         distance_label.pack()
         back_button = tk.Button(self.result_frame, text="Back", command=self.hide_result)
         back_button.pack()
-        # self.show_route()
 
     def hide_result(self):
         """Hide the result page"""
         self.result_frame.pack_forget()
-        self.result = 'close'
         self.pack_components()
 
     def show_result(self):
         """Show result page"""
         self.result_frame.pack(fill=tk.BOTH)
-        self.result = 'open'
-        self.frame1.pack_forget()
-        self.frame2.pack_forget()
-        self.frame3.pack_forget()
+        self.hide_components()
+        self.map_frame.pack_forget()
+
+    def info_selected(self, event):
+        """Handle selected infos"""
+        index = self.info_box.curselection()[0]
+        value = self.info_choice[index]
+        if self.info_status == 'close':
+            self.select_frame = tk.Frame()
+            self.select_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            self.info_status = 'open'
+            if value == '- Route info':
+                self.hide_components()
+                self.map_frame.pack(fill=tk.BOTH, expand=True)
+                label = tk.Label(self.select_frame, text='Route')
+                label.config(background="#fffac5")
+                label.pack()
+                box = ttk.Combobox(self.select_frame)
+                box.pack(side=tk.TOP, padx=5, pady=5)
+                box['values'] = ['Route1', 'Route3', 'Special']
+                box.bind("<<ComboboxSelected>>", self.handle_combobox_select)
+            elif value == '- Graph':
+                pass
+        elif self.info_status == 'open':
+            self.select_frame.pack_forget()
+            self.pack_components()
+            self.info_status = 'close'
+
+    def hide_components(self):
+        """Hide function that will hide the first page"""
+        self.map_frame.pack_forget()
+        self.input_frame.pack_forget()
 
     def button_clicked(self):
         """Command handle when the button was clicked"""
@@ -159,7 +177,7 @@ class BusServicePlanner(tk.Frame):
     def set_image_path(self, image_path):
         """Change Image"""
         self.image_path = image_path
-        for widget in self.frame3.winfo_children():
+        for widget in self.map_frame.winfo_children():
             widget.destroy()
         self.display_image()
 

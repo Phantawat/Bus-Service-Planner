@@ -28,5 +28,5 @@ if __name__ == '__main__':
     controller = BusServiceController(view, model)
     view.set_controller(controller)
     root.title("(KU) Bus Service Planner")
-    root.geometry("900x500")
+    # root.geometry("900x500")
     root.mainloop()
