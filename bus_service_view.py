@@ -103,15 +103,15 @@ class BusServicePlanner(tk.Frame):
         img = Image.open(self.image_path)
         photo = ImageTk.PhotoImage(img)
         label = tk.Label(self.map_frame, image=photo)
-        label.image = photo  # Keep a reference to the image to prevent garbage collection
+        label.image = photo
         label.pack(expand=True)
 
-    def display_result(self, path, distance):
+    def display_result(self, line, distance):
         """A new page displays the result"""
         self.result_frame = tk.Frame()
         self.show_result()
         # Create labels to display the result
-        result_label = tk.Label(self.result_frame, text=f"Shortest path: {path}")
+        result_label = tk.Label(self.result_frame, text=f"You can take Line: {line}")
         result_label.pack()
         distance_label = tk.Label(self.result_frame, text=f"Total distance: {distance} Km")
         distance_label.pack()

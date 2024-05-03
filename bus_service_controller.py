@@ -9,9 +9,7 @@ class BusServiceController:
 
     def handle_clicked(self, data, start, end):
         """Handling user clicked"""
-        # self.model.set_data(data)
-        # path, total_distance = self.model.dijkstra_shortest_route(start, end)
-        self.model.create_graph(data)
-        path, total_distance = self.model.bfs_shortest_route(start, end)
+        self.model.set_data(data)
+        path, total_distance = self.model.find_shortest_route(start, end)
         self.view.display_result(path, total_distance)
 
