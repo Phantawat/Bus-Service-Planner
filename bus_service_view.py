@@ -1,5 +1,4 @@
 """Doc string"""
-import webbrowser
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
@@ -65,7 +64,7 @@ class BusServicePlanner(tk.Frame):
         self.info_box.pack(fill=tk.Y, expand=True)
         self.info_box.config(bg="#af8f55", width=10)
         self.info_box.bind('<Double-Button-1>', self.info_selected)
-        self.info_choice = ['- Route info', '- Graph']
+        self.info_choice = ['- Route info', '- Graph', '- Story telling', '- Information', '- Comment']
         for choice in self.info_choice:
             self.info_box.insert(tk.END, choice)
 
@@ -106,14 +105,14 @@ class BusServicePlanner(tk.Frame):
         label.image = photo
         label.pack(expand=True)
 
-    def display_result(self, line, distance):
+    def display_result(self, text1, text2):
         """A new page displays the result"""
         self.result_frame = tk.Frame()
         self.show_result()
         # Create labels to display the result
-        result_label = tk.Label(self.result_frame, text=f"You can take Line: {line}")
+        result_label = tk.Label(self.result_frame, text=text1)
         result_label.pack()
-        distance_label = tk.Label(self.result_frame, text=f"Total distance: {distance} Km")
+        distance_label = tk.Label(self.result_frame, text=text2)
         distance_label.pack()
         back_button = tk.Button(self.result_frame, text="Back", command=self.hide_result)
         back_button.pack()
@@ -147,8 +146,10 @@ class BusServicePlanner(tk.Frame):
                 box.pack(side=tk.TOP, padx=5, pady=5)
                 box['values'] = ['Route1', 'Route3', 'Special']
                 box.bind("<<ComboboxSelected>>", self.handle_combobox_select)
+            elif value == '- Story telling':
+                self.controller.get_data_story(self.bus_data)
             elif value == '- Graph':
-                pass
+                self.controller.get_graph(self.bus_data)
         elif self.info_status == 'open':
             self.select_frame.pack_forget()
             self.pack_components()
@@ -164,10 +165,6 @@ class BusServicePlanner(tk.Frame):
         start = self.start_box.get()
         end = self.ending_box.get()
         self.controller.handle_clicked(self.bus_data, start, end)
-
-    def show_route(self):
-        # Open a new web page in the default browser to display the route on a map
-        webbrowser.open_new_tab("https://www.google.com/maps/dir/" + self.start_box.get() + "/" + self.ending_box.get())
 
     def handle_combobox_select(self, event):
         """Callback function for combobox selection"""

@@ -13,3 +13,13 @@ class BusServiceController:
         path, total_distance = self.model.find_shortest_route(start, end)
         self.view.display_result(path, total_distance)
 
+    def get_data_story(self, data):
+        """Get a story telling"""
+        self.model.set_data(data)
+        story = self.model.storytelling()
+        self.view.display_result(f"This is a story from data {story}", None)
+
+    def get_graph(self, data):
+        """Create graph when user click"""
+        self.model.set_data(data)
+        self.model.create_graph()
