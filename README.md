@@ -1,31 +1,38 @@
-# Bus-Service-Planner
+# Bus Service Planner
 [![Pylint Score](https://img.shields.io/badge/pylint_score-10-green.svg)](https://github.com/Phantawat/Bus-Service-Planner)
 
-## Summary
-The Kasetsart University Shuttle Bus Service Route Planner is a project aimed at providing students and staff with an efficient way to navigate the campus using the university's shuttle bus service. The application utilizes graph theory algorithms to compute optimal bus routes and schedules, helping users reach their destinations quickly and conveniently.
-
 ## Description
-This project aims to develop a comprehensive Shuttle Bus Service Route Planner for Kasetsart University, integrating graph theory algorithms to provide users with optimal bus routes and schedules within the campus. The application allows users to select a starting point and destination, computes the shortest route using graph vertices, and displays the route on the user interface. In case there are multiple routes available, the application automatically selects the shortest route by distance.
+The Bus Service Planner is a graphical user interface application designed to assist users in planning bus routes. Users can input their desired starting and ending bus stops, and the application will provide route information. The project aims to develop a Shuttle Bus Service Route Planner for Kasetsart University, facilitating efficient navigation and finding a shortest route for students and staff.
 
-## Main Features
-Compute the Shortest Route: Utilizes graph theory algorithms to compute the shortest route between selected starting point and destination.
-Show Shortest Route on Display: Displays the shortest route on the user interface for easy navigation.
-User Input: Allows users to select the route, starting point, and destination interactively.
-Distance Calculation: Displays the distance between two points to provide users with additional information.
-Graph Visualization: Provides visualization of data correlations, helping users understand the bus service better.
-Data Used
-The project utilizes the KU-Transportation dataset, which includes information about bus routes, shuttle bus lines, and bus stops. The dataset contains numerical attributes that are used for descriptive statistics and correlation analysis.
+## Screenshots
+![Bus Service Planner UI](screenshot.png)
 
-## Dataset Information:
+## Installation
+To install the Bus Service Planner, follow these steps:
 
-Shuttle Bus Lines: 4 lines, but only 3 lines are used depending on the current situation.
-Bus Stops: Compose of 3 shuttle bus lines, with Line 1 containing 23 stops, Line 3 containing 25 stops, and Special Line containing 3 stops.
-Dataset Source: Kasetsart University Car Service Routes
+1. Clone the repository to your local machine.
+2. Install the required dependencies using pip:
+    ```
+    pip freeze > requirements.txt
+    pip install -r requirements.txt
+    ```
+3. Prepare the necessary data by downloading the bus data from [Bus_Service_Planner.csv].
 
-Columns Used for Analysis:
+## How to Run
+To run the Bus Service Planner, follow these steps:
 
-Distance for Line 1 (Km)
-Distance for Line 3 (Km)
-Distance for Special Line (Km)
-Distance between 2 Stations (Km)
-Time Between 2 Station Line 1 (mins)
+1. Navigate to the project directory in your terminal.
+2. Run the main Python script:
+    ```
+    python bus_service_app.py
+    ```
+3. The Bus Service Planner GUI will launch.
+
+## Project Documents
+- [Project Proposal](https://docs.google.com/document/d/15WwvjgF_qdDel1Ft58_7LdeG3i1TWAUV20i16kfwcQ4/edit?usp=sharing)
+- [Development Plan](link_to_development_plan)
+- [UML Diagrams](link_to_UML_diagrams)
+
+## Data Sources
+- [Data Sources](https://www.ku.ac.th/en/car-service-routes-in-maha-vickya-sai)
+

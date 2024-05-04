@@ -20,7 +20,6 @@ def read_csv_file():
 
 if __name__ == '__main__':
     bus_data = read_csv_file()
-    print(bus_data)
     root = tk.Tk()
     model = BusServiceModel()
     image_path = "route1.jpg"

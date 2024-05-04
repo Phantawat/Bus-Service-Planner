@@ -17,9 +17,4 @@ class BusServiceController:
         """Get a story telling"""
         self.model.set_data(data)
         story = self.model.storytelling()
-        self.view.display_result(f"This is a story from data {story}", None)
-
-    def get_graph(self, data):
-        """Create graph when user click"""
-        self.model.set_data(data)
-        self.model.create_graph()
+        self.view.display_result(story, None)

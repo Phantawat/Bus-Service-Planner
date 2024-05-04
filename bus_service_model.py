@@ -6,10 +6,15 @@ import matplotlib.pyplot as plt
 class BusServiceModel:
     def __init__(self):
         self.data = None
-        self.df = pd.DataFrame(self.data)
+        self.df = None
 
     def set_data(self, data):
+        """Set up data"""
         self.data = data
+
+    def set_data_frame(self):
+        """Set up data frame"""
+        self.df = pd.DataFrame(self.data)
 
     def find_common_lines(self):
         stops_lines = {}
@@ -27,6 +32,9 @@ class BusServiceModel:
         return common_lines
 
     def find_shortest_route(self, start, end):
+        # Check whether start or end is blank.
+        if start == '' or end == '':
+            return f'Please, choose your destination', 'press back to go back.'
         # Find common line and filter data
         common_lines = self.find_common_lines()
         common_line = common_lines[(start, end)]
@@ -43,30 +51,9 @@ class BusServiceModel:
         return f"You can take Line: {filtered_data[(start, end)]}", f"Total distance: {distance} Km"
 
     def storytelling(self):
-        """Story telling from the data"""
-        # return self.df.head()
-        pass
-
-    def create_graph(self):
-        """Create a graph of distances between bus stops"""
-        # Extract relevant data for visualization
-        # stops = self.df['Bus stop']
-        # distances = self.df[['Distance for Line 1 (Km)', 'Distance for Line 3 (Km)', 'Distance for Special Line (Km)']]
-        #
-        # # Plotting
-        # plt.figure(figsize=(10, 6))
-        # for i in range(len(distances.columns)):
-        #     plt.plot(stops, distances.iloc[:, i], marker='o', label=distances.columns[i])
-        #
-        # # Adding labels and title
-        # plt.xlabel('Bus Stops')
-        # plt.ylabel('Distance (Km)')
-        # plt.title('Distances between Bus Stops for Different Lines')
-        # plt.xticks(rotation=45)
-        # plt.legend()
-        # plt.grid(True)
-        #
-        # # Show plot
-        # plt.tight_layout()
-        # plt.show()
-        pass
+        """Generate a data storytelling narrative based on the bus service data."""
+        # Basic storytelling example: summarize the number of stops and lines
+        self.set_data_frame()
+        num_stops = len(self.df)
+        story = f"The bus service data contains information about {num_stops} stops."
+        return story

@@ -1,7 +1,11 @@
 """Doc string"""
 import tkinter as tk
+import seaborn as sns
+import matplotlib.pyplot as plt
 from tkinter import ttk
 from tkinter import font
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from PIL import Image, ImageTk
 
 
@@ -27,6 +31,7 @@ class BusServicePlanner(tk.Frame):
         self.input_frame = tk.Frame()
         self.map_frame = tk.Frame()
         self.info_frame = tk.Frame()
+        self.statistics_frame = tk.Frame()
 
         self.label_title()
         self.create_input_box("Route")
@@ -43,6 +48,7 @@ class BusServicePlanner(tk.Frame):
         self.info_frame.pack(side=tk.LEFT, fill=tk.Y)
         self.input_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.map_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.statistics_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
         self.parent.config(background="#fffac5")
         self.title_frame.config(background="#ffffff")
@@ -62,9 +68,10 @@ class BusServicePlanner(tk.Frame):
         """Add info in the frame"""
         self.info_box = tk.Listbox(self.info_frame)
         self.info_box.pack(fill=tk.Y, expand=True)
-        self.info_box.config(bg="#af8f55", width=10)
+        self.info_box.config(bg="#af8f55", width=20)
         self.info_box.bind('<Double-Button-1>', self.info_selected)
-        self.info_choice = ['- Route info', '- Graph', '- Story telling', '- Information', '- Comment']
+        self.info_choice = ['- Route info', '', '- Information', '', '- Data Storytelling', '  - Distribution Graph', '  - Descriptive statistics',
+                            '  - Correlation', '', '- Comment']
         for choice in self.info_choice:
             self.info_box.insert(tk.END, choice)
 
@@ -107,6 +114,8 @@ class BusServicePlanner(tk.Frame):
 
     def display_result(self, text1, text2):
         """A new page displays the result"""
+        if hasattr(self, 'result_frame') and self.result_frame is not None:
+            self.result_frame.destroy()
         self.result_frame = tk.Frame()
         self.show_result()
         # Create labels to display the result
@@ -146,12 +155,16 @@ class BusServicePlanner(tk.Frame):
                 box.pack(side=tk.TOP, padx=5, pady=5)
                 box['values'] = ['Route1', 'Route3', 'Special']
                 box.bind("<<ComboboxSelected>>", self.handle_combobox_select)
-            elif value == '- Story telling':
+            elif value == '  - Data Storytelling':
                 self.controller.get_data_story(self.bus_data)
-            elif value == '- Graph':
-                self.controller.get_graph(self.bus_data)
+            elif value == '  - Distribution Graph':
+                self.hide_components()
+                self.plot_graph()
         elif self.info_status == 'open':
             self.select_frame.pack_forget()
+            for widget in self.statistics_frame.winfo_children():
+                widget.destroy()
+            self.statistics_frame.pack_forget()
             self.pack_components()
             self.info_status = 'close'
 
@@ -180,3 +193,14 @@ class BusServicePlanner(tk.Frame):
 
     def set_controller(self, controller):
         self.controller = controller
+
+    def plot_graph(self):
+        """Method for plotting graph"""
+        self.fig = Figure(figsize=(8, 6))
+        plot1 = self.fig.add_subplot(111)
+        sns.barplot(x=self.bus_data[0], y=self.bus_data[1], color='b', ax=plot1)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.statistics_frame)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack()
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.statistics_frame)
+        self.toolbar.update()
