@@ -1,11 +1,11 @@
 """Doc string"""
 import tkinter as tk
+import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from tkinter import ttk
 from tkinter import font
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
 
 
@@ -19,6 +19,8 @@ class BusServicePlanner(tk.Frame):
         self.image_path = image_path
         self.options = {'sticky': tk.NSEW, 'padx': 5, 'pady': 5}
         self.info_status = 'close'
+        self.fig = Figure()
+        self.ax = self.fig.add_subplot()
         self.init_components()
 
     def init_components(self):
@@ -26,12 +28,14 @@ class BusServicePlanner(tk.Frame):
         self.parent.option_add('*Font', font)
         self.menubar = tk.Menu(self.parent)
         self.parent.config(menu=self.menubar)
+        self.df = pd.read_csv("Bus_Service_Planner.csv")
 
         self.title_frame = tk.Frame()
         self.input_frame = tk.Frame()
         self.map_frame = tk.Frame()
         self.info_frame = tk.Frame()
         self.statistics_frame = tk.Frame()
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.statistics_frame)
 
         self.label_title()
         self.create_input_box("Route")
@@ -48,7 +52,7 @@ class BusServicePlanner(tk.Frame):
         self.info_frame.pack(side=tk.LEFT, fill=tk.Y)
         self.input_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.map_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-        self.statistics_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.statistics_frame.pack_forget()
 
         self.parent.config(background="#fffac5")
         self.title_frame.config(background="#ffffff")
@@ -70,8 +74,8 @@ class BusServicePlanner(tk.Frame):
         self.info_box.pack(fill=tk.Y, expand=True)
         self.info_box.config(bg="#af8f55", width=20)
         self.info_box.bind('<Double-Button-1>', self.info_selected)
-        self.info_choice = ['- Route info', '', '- Information', '', '- Data Storytelling', '  - Distribution Graph', '  - Descriptive statistics',
-                            '  - Correlation', '', '- Comment']
+        self.info_choice = ['- Route info', '', '- Information', '', '- Data Storytelling', '  - Distribution Graph',
+                            '  - Descriptive statistics','  - Correlation', '', '- Comment']
         for choice in self.info_choice:
             self.info_box.insert(tk.END, choice)
 
@@ -145,8 +149,8 @@ class BusServicePlanner(tk.Frame):
             self.select_frame = tk.Frame()
             self.select_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             self.info_status = 'open'
+            self.hide_components()
             if value == '- Route info':
-                self.hide_components()
                 self.map_frame.pack(fill=tk.BOTH, expand=True)
                 label = tk.Label(self.select_frame, text='Route')
                 label.config(background="#fffac5")
@@ -158,12 +162,12 @@ class BusServicePlanner(tk.Frame):
             elif value == '  - Data Storytelling':
                 self.controller.get_data_story(self.bus_data)
             elif value == '  - Distribution Graph':
-                self.hide_components()
-                self.plot_graph()
+                self.plot_hist()
+            elif value == '  - Correlation':
+                self.show_correlation()
         elif self.info_status == 'open':
             self.select_frame.pack_forget()
-            for widget in self.statistics_frame.winfo_children():
-                widget.destroy()
+            self.canvas.get_tk_widget().pack_forget()
             self.statistics_frame.pack_forget()
             self.pack_components()
             self.info_status = 'close'
@@ -172,6 +176,7 @@ class BusServicePlanner(tk.Frame):
         """Hide function that will hide the first page"""
         self.map_frame.pack_forget()
         self.input_frame.pack_forget()
+        self.statistics_frame.pack()
 
     def button_clicked(self):
         """Command handle when the button was clicked"""
@@ -194,13 +199,19 @@ class BusServicePlanner(tk.Frame):
     def set_controller(self, controller):
         self.controller = controller
 
-    def plot_graph(self):
-        """Method for plotting graph"""
-        self.fig = Figure(figsize=(8, 6))
-        plot1 = self.fig.add_subplot(111)
-        sns.barplot(x=self.bus_data[0], y=self.bus_data[1], color='b', ax=plot1)
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.statistics_frame)
+    def plot_hist(self):
+        """Plot a histogram graph"""
+        self.ax.clear()
+        sns.histplot(self.df['Distance between 2 stations (Km)'], ax=self.ax)
         self.canvas.draw()
-        self.canvas.get_tk_widget().pack()
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self.statistics_frame)
-        self.toolbar.update()
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def show_correlation(self):
+        """Show correlation between data"""
+        self.ax.clear()
+        sns.heatmap(self.df.corr(numeric_only=True), annot=True,
+                    cmap=sns.color_palette('coolwarm'),
+                    ax=self.ax
+                    )
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)

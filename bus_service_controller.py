@@ -16,5 +16,5 @@ class BusServiceController:
     def get_data_story(self, data):
         """Get a story telling"""
         self.model.set_data(data)
-        story = self.model.storytelling()
-        self.view.display_result(story, None)
+        story, shape = self.model.storytelling()
+        self.view.display_result(story, shape)

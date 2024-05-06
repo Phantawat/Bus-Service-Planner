@@ -26,9 +26,12 @@ class BusServiceModel:
         for stop1 in stops_lines:
             for stop2 in stops_lines:
                 if stop1 != stop2:  # Ensure we're not comparing the same stop
-                    common = [line for line in stops_lines[stop1] if line in stops_lines[stop2]]
+                    common = [line1 for line1 in stops_lines[stop1] if line1 in stops_lines[stop2]]
                     if common:
-                        common_lines[(stop1, stop2)] = stops_lines[stop1]
+                        if len(stops_lines[stop1]) > len(stops_lines[stop2]):
+                            common_lines[(stop1, stop2)] = stops_lines[stop2]
+                        else:
+                            common_lines[(stop1, stop2)] = stops_lines[stop1]
         return common_lines
 
     def find_shortest_route(self, start, end):
@@ -55,5 +58,6 @@ class BusServiceModel:
         # Basic storytelling example: summarize the number of stops and lines
         self.set_data_frame()
         num_stops = len(self.df)
+        shape = self.df.shape
         story = f"The bus service data contains information about {num_stops} stops."
-        return story
+        return story, shape
