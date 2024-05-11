@@ -10,7 +10,8 @@ from PIL import Image, ImageTk
 
 
 class BusServicePlanner(tk.Frame):
-    """Bus service planner class that keep all user-interface"""
+    """Bus service planner class that keeps all user-interface"""
+
     def __init__(self, parent, bus_data: list, image_path):
         super().__init__(parent)
         self.info_choice = []
@@ -36,6 +37,7 @@ class BusServicePlanner(tk.Frame):
         self.info_frame = tk.Frame()
         self.statistics_frame = tk.Frame()
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.statistics_frame)
+        self.statistics_label = ttk.Label()
 
         self.label_title()
         self.create_input_box("Route")
@@ -47,12 +49,13 @@ class BusServicePlanner(tk.Frame):
         self.pack_components()
 
     def pack_components(self):
-        """Pack components of all frame"""
+        """Pack components of all frames"""
         self.title_frame.pack(side=tk.TOP, fill=tk.BOTH)
         self.info_frame.pack(side=tk.LEFT, fill=tk.Y)
         self.input_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.map_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         self.statistics_frame.pack_forget()
+        self.statistics_label.pack_forget()
 
         self.parent.config(background="#fffac5")
         self.title_frame.config(background="#ffffff")
@@ -75,7 +78,7 @@ class BusServicePlanner(tk.Frame):
         self.info_box.config(bg="#af8f55", width=20)
         self.info_box.bind('<Double-Button-1>', self.info_selected)
         self.info_choice = ['- Route info', '', '- Information', '', '- Data Storytelling', '  - Distribution Graph',
-                            '  - Descriptive statistics','  - Correlation', '', '- Comment']
+                            '  - Descriptive statistics', '  - Correlation', '', '- Comment']
         for choice in self.info_choice:
             self.info_box.insert(tk.END, choice)
 
@@ -98,7 +101,7 @@ class BusServicePlanner(tk.Frame):
 
     def create_button(self):
         """Submit function for getting the starting and ending bus stops"""
-        self.submit = tk.Button(self.input_frame, text="Submit", command=self.button_clicked)
+        self.submit = ttk.Button(self.input_frame, text="Submit", command=self.button_clicked)
         self.submit.pack(side=tk.TOP, padx=5, pady=5)
 
     def get_bus_stop(self):
@@ -127,7 +130,7 @@ class BusServicePlanner(tk.Frame):
         result_label.pack()
         distance_label = tk.Label(self.result_frame, text=text2)
         distance_label.pack()
-        back_button = tk.Button(self.result_frame, text="Back", command=self.hide_result)
+        back_button = ttk.Button(self.result_frame, text="Back", command=self.hide_result)
         back_button.pack()
 
     def hide_result(self):
@@ -145,13 +148,19 @@ class BusServicePlanner(tk.Frame):
         """Handle selected infos"""
         index = self.info_box.curselection()[0]
         value = self.info_choice[index]
+
+        # Check if info_status is 'close'
         if self.info_status == 'close':
+            # Show select_frame and set info_status to 'open'
             self.select_frame = tk.Frame()
-            self.select_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            self.select_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             self.info_status = 'open'
-            self.hide_components()
+            self.hide_components()  # Hide components based on selected value
+            back_label = tk.Label(self.select_frame, text='Double click on the same place to go back')
+            back_label.pack(side=tk.BOTTOM)
+            back_label.config(foreground='red')
+            # Based on the selected value, show different components
             if value == '- Route info':
-                self.map_frame.pack(fill=tk.BOTH, expand=True)
                 label = tk.Label(self.select_frame, text='Route')
                 label.config(background="#fffac5")
                 label.pack()
@@ -159,16 +168,25 @@ class BusServicePlanner(tk.Frame):
                 box.pack(side=tk.TOP, padx=5, pady=5)
                 box['values'] = ['Route1', 'Route3', 'Special']
                 box.bind("<<ComboboxSelected>>", self.handle_combobox_select)
-            elif value == '  - Data Storytelling':
-                self.controller.get_data_story(self.bus_data)
+                self.map_frame.pack(side=tk.TOP, fill=tk.BOTH)
             elif value == '  - Distribution Graph':
                 self.plot_hist()
             elif value == '  - Correlation':
                 self.show_correlation()
+            elif value == '  - Descriptive statistics':
+                self.show_statistics()
+            elif value == '- Information':
+                box = ttk.Combobox(self.select_frame)
+                box.pack(side=tk.TOP, padx=5, pady=5)
+                box['value'] = self.get_bus_stop()
+                box.bind('<<ComboboxSelected>>', self.show_bus_information)
+        # Check if info_status is 'open'
         elif self.info_status == 'open':
+            # Hide select_frame
             self.select_frame.pack_forget()
-            self.canvas.get_tk_widget().pack_forget()
             self.statistics_frame.pack_forget()
+            self.canvas.get_tk_widget().pack_forget()
+            self.ax.clear()
             self.pack_components()
             self.info_status = 'close'
 
@@ -215,3 +233,24 @@ class BusServicePlanner(tk.Frame):
                     )
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def show_statistics(self):
+        """Method for displaying the statistics value of data"""
+        self.statistics_label.pack()
+        # Calculate statistics
+        mean = self.df.mean(numeric_only=True)
+        median = self.df.median(numeric_only=True)
+        statistics_text = f"Mean: {mean}\nMedian: {median}"
+        self.statistics_label.config(text=statistics_text)
+
+    def show_bus_information(self, event):
+        """Show information about a selected bus route"""
+        # Get bus information for the selected route
+        route = event.widget.get()
+        text = ''
+        for stop in self.bus_data:
+            if stop['Bus stop'] == route:
+                info = stop
+                for i in info:
+                    text += f"{i}: {stop[i]} \n"
+        self.display_result(text, None)

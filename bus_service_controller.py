@@ -18,3 +18,8 @@ class BusServiceController:
         self.model.set_data(data)
         story, shape = self.model.storytelling()
         self.view.display_result(story, shape)
+
+    def show_info(self, data):
+        """Show information of app"""
+        info = self.model.set_data(data)
+        self.view.display_result(info, '-')

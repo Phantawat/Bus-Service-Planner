@@ -61,3 +61,7 @@ class BusServiceModel:
         shape = self.df.shape
         story = f"The bus service data contains information about {num_stops} stops."
         return story, shape
+
+    def information(self):
+        """Generate information of Bus"""
+        return
