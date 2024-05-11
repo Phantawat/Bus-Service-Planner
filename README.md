@@ -28,10 +28,6 @@ To run the Bus Service Planner, follow these steps:
     ```
 3. The Bus Service Planner GUI will launch.
 
-## Project Documents
-- [Project Proposal](https://docs.google.com/document/d/15WwvjgF_qdDel1Ft58_7LdeG3i1TWAUV20i16kfwcQ4/edit?usp=sharing)
-- [Development Plan](https://docs.google.com/document/d/1y8TG2Ou6JUVrNKCJe7x8iSZKzoP77_M6KPbuOX8pOtk/edit?usp=sharing)
-- [UML Diagrams](UML_class_diagram.png)
 
 ## Data Sources
 - [Data Sources](https://www.ku.ac.th/en/car-service-routes-in-maha-vickya-sai)
