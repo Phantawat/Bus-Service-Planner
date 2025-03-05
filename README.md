@@ -13,7 +13,6 @@ To install the Bus Service Planner, follow these steps:
 1. Clone the repository to your local machine.
 2. Install the required dependencies using pip:
     ```
-    pip freeze > requirements.txt
     pip install -r requirements.txt
     ```
 3. Prepare the necessary data by downloading the bus data from [Bus_Service_Planner.csv].
